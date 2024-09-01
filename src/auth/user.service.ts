@@ -29,7 +29,8 @@ export class UserService {
       return await this.userRepository.save({
         email: registerDto.email,
         name: registerDto.username,
-        passwordHash: hashPassword(registerDto.password)
+        passwordHash: hashPassword(registerDto.password),
+        verifiedAccount: false
       })
     } catch(err){
       if(err.driverError.code == "ER_DUP_ENTRY"){
