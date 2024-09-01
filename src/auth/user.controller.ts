@@ -3,9 +3,11 @@ import { UserService } from './user.service';
 import { UserRegisterDTO } from './dto/UserRegister.dto';
 import { UserLoginDTO } from './dto/UserLogin.dto';
 import { Response } from 'express';
+import { ApiHeader, ApiHeaders } from '@nestjs/swagger';
 
 
 @Controller('user')
+@ApiHeader({name: "x-api-token", allowEmptyValue: false, required: true, example: "api-token"})
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
