@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserRegisterDTO } from './dto/UserRegister.dto';
@@ -34,9 +34,7 @@ export class UserService {
       })
     } catch(err){
       if(err.driverError.code == "ER_DUP_ENTRY"){
-        return {
-          err: "email já registrado"
-        }
+        throw new HttpException("email já registrado", HttpStatus.BAD_REQUEST)
       }
     }
   }
@@ -47,17 +45,13 @@ export class UserService {
     })
 
     if(!userExists){
-      return {
-        err: "Usuario não encontrado"
-      }
+      throw new HttpException("Usuario não encontrado", HttpStatus.NOT_FOUND)
     }
 
     const validPassword = await verifyPassword(userExists.passwordHash, dto.password)
 
     if(!validPassword){
-      return {
-        err: "Senha invalida"
-      }
+      throw new HttpException("Senha invalida", HttpStatus.BAD_REQUEST)
     }
 
     const payload = { sub: userExists.id, username: userExists.name };
@@ -105,9 +99,7 @@ export class UserService {
     })
 
     if(!userExists){
-      return {
-        err: "Usuario não encontrado"
-      }
+      throw new HttpException("Usuario não encontrado", HttpStatus.BAD_REQUEST)
     }
 
     const payload = { sub: userExists.id, username: userExists.name };
