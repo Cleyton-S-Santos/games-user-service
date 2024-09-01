@@ -6,26 +6,18 @@ import {databaseProviders} from "./config/database.providers"
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { RedisProvider } from './config/redis.provider';
 import { config } from 'dotenv';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import configValues from "./config/configService"
 
 config()
 @Module({
   imports: [UserModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configValues] 
-    }),
-    RedisModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'single',
-        host: configService.get<string>('REDIS_HOST'),
-        port: configService.get<number>('REDIS_PORT'),
-        username: configService.get<string>('REDIS_USERNAME'),
-        password: configService.get<string>('REDIS_PASSWORD'),
-      }),
-      inject: [ConfigService],
+    RedisModule.forRoot({
+      options: {
+        username: process.env.REDIS_USERNAME,
+        password: process.env.REDIS_PASSWORD,
+        host: process.env.REDIS_HOST, 
+        port: Number(process.env.REDIS_PORT),
+      },
+      type: 'single'
     }),
   ],
   controllers: [AppController],
