@@ -6,12 +6,17 @@ import {databaseProviders} from "./config/database.providers"
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { RedisProvider } from './config/redis.provider';
 import { config } from 'dotenv';
-import { APP_GUARD } from '@nestjs/core';
 import { AccessMiddleware } from './config/ApiToken.security';
+import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 
 config()
 @Module({
   imports: [UserModule,
+    PrometheusModule.register({
+      defaultLabels: {
+        app: "User service",
+      },
+    }),
     RedisModule.forRoot({
       options: {
         username: process.env.REDIS_USERNAME,
@@ -29,6 +34,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AccessMiddleware)
+      .exclude({path: "/metrics", method: RequestMethod.ALL})
       .forRoutes({ path: '*', method: RequestMethod.ALL }); // Aplica para todas as rotas
   }
 }
